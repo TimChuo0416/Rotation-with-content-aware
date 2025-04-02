@@ -1,88 +1,46 @@
-# Content-Aware-Rotation
-* Reproduction of Kaiming He's Paper [**Content-Aware Rotation**](http://kaiminghe.com/publications/iccv13car.pdf) on ICCV 2013.<br>
-* I just test this project on **Windows 10**, there may be something wrong on Linux system.<br>
+# Content-Aware Rotation – Modified Version
+
+This is a modified implementation of [Kaiming He et al.'s](http://kaiminghe.com/publications/iccv13car.pdf) **Content-Aware Rotation** (ICCV 2013), originally reproduced by [ForeverPs](https://github.com/ForeverPs/content-aware-rotation).
+
+## 🔧 What's New
+
+This fork includes:
+- Code refactoring for readability and modularity
+- Add Image preprocess to enhance the result
+- Additional test cases or example outputs
+- Bug fixes for improved stability across systems
+
+> ✅ Tested on: Windows 10, Linux
+
 ---
-#### Contents
 
-1. [Dependency](#Dependency)
-1. [Formula Derivation](#formula-derivation)
-1. [Usage](#Usage)
-1. [Results](#Results)
-1. [References](#References)
+## 📦 Dependencies
+
+- Python 3.6+
+- `pillow==5.1.0`
+- `numpy==1.14.5`
+- `opencv-python==4.2.0`
+- `matplotlib==2.2.2`
+- `tensorflow==1.10.0`
+
 ---
 
-#### Dependency
-###### &emsp;Python&ensp;3.6 or newer<br>
-###### &emsp;pillow == 5.1.0<br>
-###### &emsp;numpy == 1.14.5<br>
-###### &emsp;opencv == 4.2.0<br>
-###### &emsp;matplotlib == 2.2.2<br>
-###### &emsp;tensorflow == 1.10.0<br>
+## 📐 Mathematical Formulation
 
-#### Formula Derivation
-* **Rotation Manipulation**<br>
-![eq2](https://github.com/ForeverPs/content-aware-rotation/blob/master/eq/eq2.jpg)<br>
-suppose that : <br>![eq3](https://github.com/ForeverPs/content-aware-rotation/blob/master/eq/eq3.jpg),<br>
-then we have : <br>![eq4](https://github.com/ForeverPs/content-aware-rotation/blob/master/eq/eq4.jpg)<br>
-further, we can get the derivative : <br>![eq5](https://github.com/ForeverPs/content-aware-rotation/blob/master/eq/eq5.jpg)<br>
+The original paper introduces an optimization-based method for rotating images content-awarely to correct angles while preserving structural integrity.
 
-* **Line Preservation**<br>
-![eq7](https://github.com/ForeverPs/content-aware-rotation/blob/master/eq/eq7.jpg)<br>
-suppose that : <br>![eq8](https://github.com/ForeverPs/content-aware-rotation/blob/master/eq/eq8.jpg),<br>
-then we have : <br>![eq9](https://github.com/ForeverPs/content-aware-rotation/blob/master/eq/eq9.jpg)<br>
-further, we can get the derivative : <br>![eq10](https://github.com/ForeverPs/content-aware-rotation/blob/master/eq/eq10.jpg)<br>
+All formula derivations and illustrations are retained from the original repository, including:
+- Rotation manipulation
+- Line, shape, and boundary preservation
+- Optimization steps (fix θ, solve for V and vice versa)
 
-* **Shape Preservation**<br>
-![eq12](https://github.com/ForeverPs/content-aware-rotation/blob/master/eq/eq12.jpg)<br>
-suppose that : <br>![eq13](https://github.com/ForeverPs/content-aware-rotation/blob/master/eq/eq13.jpg),<br>
-then we have : <br>![eq14](https://github.com/ForeverPs/content-aware-rotation/blob/master/eq/eq14.jpg)<br>
-further, we can get the derivative : <br>![eq15](https://github.com/ForeverPs/content-aware-rotation/blob/master/eq/eq15.jpg)<br>
+📷 See all equations and derivations in the original [ForeverPs repo](https://github.com/ForeverPs/content-aware-rotation).
 
-* **Boundary Preservation**<br>
-![eq17](https://github.com/ForeverPs/content-aware-rotation/blob/master/eq/eq17.jpg)<br>
-further, we can get the derivative : <br>![eq18](https://github.com/ForeverPs/content-aware-rotation/blob/master/eq/eq18.jpg)<br>
+---
 
-* **Optimization**
-* **Step 1 : Fix θ solve for V** <br>
-Sparse Linear System : <br>![eq19](https://github.com/ForeverPs/content-aware-rotation/blob/master/eq/eq19.jpg)<br>
-V is the minimum point of total energy above, thus, let : <br>
-![eq20](https://github.com/ForeverPs/content-aware-rotation/blob/master/eq/eq20.jpg)<br>
-we can get the solution for V. <br>
-* **Step 2 : Fix V solve for θ** <br>
-***Part 1 : Fix Φ, update θ***<br>
-![eq21](https://github.com/ForeverPs/content-aware-rotation/blob/master/eq/eq21.jpg)<br>
-suppose that : <br>![eq22](https://github.com/ForeverPs/content-aware-rotation/blob/master/eq/eq22.jpg)<br>
-we have : <br>![eq23](https://github.com/ForeverPs/content-aware-rotation/blob/master/eq/eq23.jpg)<br>
-then let : <br>![eq24](https://github.com/ForeverPs/content-aware-rotation/blob/master/eq/eq24.jpg)<br>
-by solving a sparse linear system, we can get the solution of θ : <br>
-![eq25](https://github.com/ForeverPs/content-aware-rotation/blob/master/eq/eq25.jpg)<br>
-***Part 2 : Fix θ, update Φ***<br>
-![eq26](https://github.com/ForeverPs/content-aware-rotation/blob/master/eq/eq26.jpg)<br>
-the solution of Φ can be easily approximately reached by enumeration based on iteration methods(increase β gradually).<br>
+## 🚀 Usage
 
-#### Usage
-* How to Use : download the whole project and run **main.py**
-* folder ep : images which are used for formula derivation and some results.
-* folder image : images which are used in original paper.
-* folder lsd : line segment detection algorithm in python version.
-* warp_mesh.py : image warping method realized by embedded function in tensorflow.
+Clone the repo and run:
 
-#### Results
-* [**The Leaning Tower of Pisa  5.5°**](https://github.com/ForeverPs/content-aware-rotation/blob/master/image/image7.jpg)<br>
-<img src= https://github.com/ForeverPs/content-aware-rotation/blob/master/eq/pisa_tower.jpg /><br><br>
-
-* [**Palace Tower  -6.1°**](https://github.com/ForeverPs/content-aware-rotation/blob/master/image/image2.png)<br>
-<img src= https://github.com/ForeverPs/content-aware-rotation/blob/master/eq/palace_tower.jpg /><br><br>
-
-* [**House Building  -5.8°**](https://github.com/ForeverPs/content-aware-rotation/blob/master/image/image1.png)<br>
-<img src= https://github.com/ForeverPs/content-aware-rotation/blob/master/eq/house.jpg /><br><br>
-
-* [**The Oriental Pearl Tower  1.8°**](https://github.com/ForeverPs/content-aware-rotation/blob/master/image/image8.jpg)<br>
-<img src= https://github.com/ForeverPs/content-aware-rotation/blob/master/eq/shanghai.jpg /><br><br>
-
-
-#### References
-##### Author&ensp;:&ensp;Kaiming He, Huiwen Chang, Jian Sun<br>
-* ###### &ensp;[Content-Aware Rotation----ICCV 2013](http://kaiminghe.com/publications/iccv13car.pdf)<br>
-##### Matlab Version<br>
-* ###### &ensp;[iRotate](https://github.com/yuchien302/iRotate)<br>
+```bash
+python main.py
