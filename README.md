@@ -8,7 +8,7 @@ This fork includes:
 - Code refactoring for readability and modularity
 - Add Image preprocess to enhance the result
 - Additional test cases or example outputs
-- Bug fixes for improved stability across systems
+- Showing LSD result in outputs.
 
 > ✅ Tested on: Windows 10, Linux
 
