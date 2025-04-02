@@ -1,0 +1,3 @@
+D:
+cd NTHU\fourth_grade\image_processing\final project\content-aware-rotation
+conda activate img-processing-env

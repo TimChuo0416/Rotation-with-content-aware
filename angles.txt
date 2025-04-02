@@ -1,0 +1,9 @@
+image00:9
+image1:-5.8
+image2:-6.1
+image1:-5.8
+image1:-5.8
+image1:-5.8
+image1:-5.8
+image7:5.5
+image8:1.8

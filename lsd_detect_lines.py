@@ -8,6 +8,7 @@ def detect_lines(img_array, angle, x_len, y_len, x, y, minLen=2, M=90):
     gray = cv2.cvtColor(src, cv2.COLOR_RGB2GRAY)
     lines = lsd(gray)
     legal_lines = list()
+    bin_count = np.zeros((90))
     for i in range(lines.shape[0]):
         pt1 = [int(lines[i, 0]), int(lines[i, 1])]
         pt2 = [int(lines[i, 2]), int(lines[i, 3])]
@@ -45,7 +46,7 @@ def detect_lines(img_array, angle, x_len, y_len, x, y, minLen=2, M=90):
 
             # sort temp_lines in y_coordinate to get sub_lines
             temp_lines.sort(key=lambda coordinates: coordinates[1])
-
+            # bin_count = np.zeros((90))
             for j in range(len(temp_lines) - 1):
                 l_start, l_end = temp_lines[j], temp_lines[j + 1]
                 l_vec = [l_start[0] - l_end[0], l_start[1] - l_end[1]]
@@ -61,7 +62,75 @@ def detect_lines(img_array, angle, x_len, y_len, x, y, minLen=2, M=90):
                     elif bin_num > 90:
                         bin_num -= 90
                     legal_lines.append([l_start[0], l_start[1], l_end[0], l_end[1], theta, bin_num])
-    return legal_lines
+                    bin_count[bin_num-1] = bin_count[bin_num-1] + 1
+
+    line_check = np.zeros((90))
+    lines_in_bins = np.empty((90, ), dtype=object)
+    for i in range(90):
+        lines_in_bins[i] = []
+    
+    for line in legal_lines:
+        lines_in_bins[line[5]-1].append(line)
+        line_check[line[5]-1] = line_check[line[5]-1]+1
+        # print(f"bin num:{line[5]}\n")
+
+    for i in range(90):
+        # print(f"bin count:{bin_count[i]}, line check:{line_check[i]}")
+        if bin_count[i] != line_check[i]:
+            print(f"{i} is off by {bin_count - line_check[i]}")
+
+    # for line in lines_in_bins:
+    #     print(f"{len(line)}")
+    merged_lines = merge_hough_lines(lines_in_bins, distance_threshold=5)
+    # return legal_lines
+    return merged_lines
+
+def merge_hough_lines(lines, distance_threshold=5):
+    """
+    Merge lines based on their angle and proximity.
+    
+    :param lines: List of lines as [x1, y1, x2, y2].
+    :param angle_threshold: Maximum angular difference to consider lines similar.
+    :param distance_threshold: Maximum distance between lines to consider merging.
+    :return: List of merged lines.
+    """
+    # print(f"{lines[0]}")
+    final_lines = list()
+    
+    
+    def distance_between_lines(line1, line2):
+        # Calculate the distance between two lines (midpoints)
+        x1, y1, x2, y2 = line1[0], line1[1], line1[2], line1[3]
+        x3, y3, x4, y4 = line2[0], line2[1], line2[2], line2[3]
+        mid1 = ((x1 + x2) / 2, (y1 + y2) / 2)
+        mid2 = ((x3 + x4) / 2, (y3 + y4) / 2)
+        return np.sqrt((mid1[0] - mid2[0])**2 + (mid1[1] - mid2[1])**2)
+
+    
+
+    for num, bin_list in enumerate(lines):
+        merged_lines = []
+        used = set()
+        # print(f"nums:{num}, elements:{bin_list}")
+        for i, line1 in enumerate(bin_list):
+            if i in used:
+                continue
+            merged = line1
+            for j, line2 in enumerate(bin_list):
+                if j in used or i == j:
+                    continue
+                if distance_between_lines(line1, line2) < distance_threshold:
+                    # Merge lines by extending to the farthest endpoints
+                    merged[0], merged[1] = min(merged[0], line2[0]), min(merged[1], line2[1])
+                    merged[2], merged[3] = max(merged[2], line2[2]), max(merged[3], line2[3])
+                    used.add(j)
+            used.add(i)
+            # merged_lines.append(merged)
+            merged_lines.append([merged[0], merged[1], merged[2], merged[3], (line1[4]+line2[4])/2, num])
+            final_lines.append([merged[0], merged[1], merged[2], merged[3], (line1[4]+line2[4])/2, num])
+
+    # # return merged_lines
+    return final_lines
 
 
 def intersect(pt1, pt2, pt3, pt4):
